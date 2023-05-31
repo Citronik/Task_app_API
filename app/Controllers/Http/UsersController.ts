@@ -6,7 +6,7 @@ import LoginUser from 'App/Validators/LoginUserValidator'
 import UpdateUser from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
-  public async register ({ request, response, auth }) {
+  public async register ({ request }) {
     console.log('registration')
     console.log(request)
     const payload = await request.validate(CreateUser)
@@ -86,7 +86,7 @@ export default class UsersController {
     return await User.all()
   }
 
-  public async showMe ({ request, response, auth }) {
+  public async showMe ({ response, auth }) {
     console.log('showMe')
     const user = await User.find(auth.user.id)
     if (!user) {
