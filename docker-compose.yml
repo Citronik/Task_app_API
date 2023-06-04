@@ -7,34 +7,34 @@ networks:
     driver: bridge
 
 services:
-  task_database:
-    container_name: task_database
-    restart: always
-    image: mysql:8.0
-    volumes:
-      - ./mysql/:/docker-entrypoint-initdb.d/
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "exit | mysql -h localhost -P 3306 -u root -p$$MYSQL_ROOT_PASSWORD",
-        ]
-      interval: 5s
-      timeout: 20s
-      retries: 30
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB_NAME}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_PORT: ${MYSQL_PORT}
-    ports:
-      - ${MYSQL_PORT}:${MYSQL_PORT}
-    expose:
-      - ${MYSQL_PORT}
-    networks:
-      - task_network
-    command: --init-file /docker-entrypoint-initdb.d/data.sql
+#  task_database:
+#    container_name: task_database
+#    restart: always
+#    image: mysql:8.0
+#    volumes:
+#      - ./mysql/:/docker-entrypoint-initdb.d/
+#    healthcheck:
+#      test:
+#        [
+#          "CMD-SHELL",
+#          "exit | mysql -h localhost -P 3306 -u root -p$$MYSQL_ROOT_PASSWORD",
+#        ]
+#      interval: 5s
+#      timeout: 20s
+#      retries: 30
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+#      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+#      MYSQL_USER: ${MYSQL_USER}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#      MYSQL_PORT: ${MYSQL_PORT}
+#    ports:
+#      - ${MYSQL_PORT}:${MYSQL_PORT}
+#    expose:
+#      - ${MYSQL_PORT}
+#    networks:
+#      - task_network
+#    command: --init-file /docker-entrypoint-initdb.d/data.sql
 
   task_backend_app:
     container_name: task_backend_app
