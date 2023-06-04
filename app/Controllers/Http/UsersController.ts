@@ -36,7 +36,12 @@ export default class UsersController {
     }
 
     await auth.attempt(uid, password)
-
+    if (auth.user) {
+      await auth.user.load('profile')
+      if (auth.user.profile) {
+        await auth.user.profile.load('avatar')
+      }
+    }
     return response.status(200).json({
       status: 'success',
       message: 'User logged in!',
