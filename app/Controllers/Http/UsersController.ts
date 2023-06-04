@@ -1,12 +1,13 @@
 //import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 //import Profile from 'App/Models/Profile'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import CreateUser from 'App/Validators/CreateUserValidator'
 import LoginUser from 'App/Validators/LoginUserValidator'
 import UpdateUser from 'App/Validators/UpdateUserValidator'
 
 export default class UsersController {
-  public async register ({ request }) {
+  public async register ({ request }: HttpContextContract) {
     console.log('registration')
     console.log(request)
     const payload = await request.validate(CreateUser)
@@ -20,24 +21,26 @@ export default class UsersController {
     // })
   }
 
-  public async login ({ request, response, auth }) {
+  public async login ({ request, response, auth }: HttpContextContract) {
     console.log('login')
     const payload = await request.validate(LoginUser)
-    const {username, email, password, rememberMeToken} = payload
+
+    const {username, email, password} = payload
     console.log(username, email, password)
-    const token = !username ? await auth.use('api').attempt(email, password) :
-      await auth.use('api').attempt(username, password)
-    //console.log(token)
-    if (!token) {
+    const uid = username || email
+    if(!uid){
       return response.status(404).json({
         status: 'failed',
         message: 'Unable to login',
       })
     }
+
+    await auth.attempt(uid, password)
+
     return response.status(200).json({
       status: 'success',
       message: 'User logged in!',
-      data: token.toJSON(),
+      data: auth.user?.toJSON(),
     })
   }
 
@@ -104,7 +107,7 @@ export default class UsersController {
 
   public async logout ({ auth, response }) {
     console.log('logout')
-    await auth.use('api').logout()
+    await auth.logout()
     response.status(200).redirect('/api/users/login')
   }
 }
