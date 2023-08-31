@@ -115,4 +115,20 @@ export default class UsersController {
     await auth.logout()
     response.status(200).redirect('/api/users/login')
   }
+
+  public async getOneUser ({ params, response, auth }) {
+    console.log('getOneUser')
+    const user = await User.find(params.id)
+    if (!user) {
+      return response.status(404).json({
+        status: 'failed',
+        message: 'User not found',
+      })
+    }
+    return response.status(200).json({
+      status: 'success',
+      message: 'User found',
+      data: user.toJSON(),
+    })
+  }
 }

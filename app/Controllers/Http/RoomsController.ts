@@ -31,7 +31,7 @@ export default class RoomsController {
   }
 
   public async getAllMyRooms ({ auth }) {
-    console.log('Create Room')
+    console.log('Get all rooms')
     const user = await User.findOrFail(auth.user.id)
     const rooms = await user.related('room').query()
     return rooms
