@@ -118,17 +118,25 @@ export default class UsersController {
 
   public async getOneUser ({ params, response, auth }) {
     console.log('getOneUser')
-    const user = await User.find(params.id)
-    if (!user) {
-      return response.status(404).json({
-        status: 'failed',
-        message: 'User not found',
+    try {
+      const user = await User.find(params.id)
+      if (!user) {
+        return response.status(404).json({
+          status: 'failed',
+          message: 'User not found',
+        })
+      }
+      return response.status(200).json({
+        status: 'success',
+        message: 'User found',
+        data: user.toJSON(),
+      })
+    } catch (error) {
+      console.log('getOneUser', error)
+      return response.status(500).json({
+        status: 'error',
+        message: error.message,
       })
     }
-    return response.status(200).json({
-      status: 'success',
-      message: 'User found',
-      data: user.toJSON(),
-    })
   }
 }
