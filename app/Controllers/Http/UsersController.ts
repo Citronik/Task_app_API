@@ -116,7 +116,7 @@ export default class UsersController {
     response.status(200).redirect('/api/users/login')
   }
 
-  public async getOneUser ({ params, response, auth }) {
+  public async getOneUser ({ params, response }) {
     console.log('getOneUser')
     try {
       const user = await User.find(params.id)
