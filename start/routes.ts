@@ -25,7 +25,8 @@ Route.get('/', async () => {
 })
 
 Route.group(() =>{
-  Route.get('photo/:id', 'UploadsController.getUrl')
+  Route.get('uploads/:id', 'UploadsController.getUrl').middleware('auth')
+
   Route.group(() =>{
     Route.post('register', 'UsersController.register')
     Route.post('login', 'UsersController.login')

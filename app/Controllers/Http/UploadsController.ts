@@ -23,7 +23,8 @@ export default class UploadsController {
   public async getUrl ({ params }: HttpContextContract) {
     console.log('generating url')
     const upload = await Upload.findOrFail(params.id)
-    upload.file.getSignedUrl()
-    return upload.file.getSignedUrl()
+    const url = upload.file.getSignedUrl()
+    console.log(url)
+    return url
   }
 }
