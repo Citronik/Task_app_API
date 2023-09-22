@@ -126,6 +126,7 @@ export default class UsersController {
           message: 'User not found',
         })
       }
+      await user.load('profile')
       return response.status(200).json({
         status: 'success',
         message: 'User found',

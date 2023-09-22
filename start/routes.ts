@@ -61,5 +61,12 @@ Route.group(() =>{
     Route.patch(':id/tasks/:task_id', 'TasksController.update').middleware('auth') // done not tested
     Route.delete(':id/tasks/:task_id', 'TasksController.delete').middleware('auth') // done not tested
     Route.post(':id/tasks', 'TasksController.create').middleware('auth') // done not tested
+
+    Route.get(':id/participants', 'ParticipantsController.getRoomParticipants').middleware('auth') // to be done
+    Route.get(':id/participants/:participant_id', 'ParticipantsController.getRoomParticipant')
+      .middleware('auth') // to be done
+    Route.post(':id/participants', 'ParticipantsController.create').middleware('auth') // to be done
+    Route.patch(':id/participants/:participant_id', 'ParticipantsController.update').middleware('auth') // to be done
+    Route.delete(':id/participants/:participant_id', 'ParticipantsController.delete').middleware('auth') // to be done
   }).prefix('rooms')
 }).prefix('api')
