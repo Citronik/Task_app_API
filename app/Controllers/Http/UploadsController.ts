@@ -1,7 +1,6 @@
 // import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Upload from 'App/Models/Upload'
 import UploadFile from 'App/Validators/UploadFileValidator'
-import Application from '@ioc:Adonis/Core/Application'
 import { Attachment } from '@ioc:Adonis/Addons/AttachmentLite'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
@@ -22,9 +21,14 @@ export default class UploadsController {
 
   public async getUrl ({ params }: HttpContextContract) {
     console.log('generating url')
-    const upload = await Upload.findOrFail(params.id)
-    const url = upload.file.getSignedUrl()
-    console.log(url)
-    return url
+    try {
+      const upload = await Upload.findOrFail(params.id)
+      const url = upload.file.getSignedUrl()
+      console.log(url)
+      return url
+    } catch (error) {
+      console.log('file url: ', error)
+      return null
+    }
   }
 }
