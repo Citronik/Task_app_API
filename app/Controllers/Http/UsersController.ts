@@ -35,7 +35,7 @@ export default class UsersController {
       })
     }
 
-    await auth.attempt(uid, password)
+    await auth.use('api').attempt(uid, password)
     if (auth.user) {
       await auth.user.load('profile')
       if (auth.user.profile) {
@@ -111,7 +111,7 @@ export default class UsersController {
 
   public async logout ({ auth, response }) {
     console.log('logout')
-    await auth.logout()
+    await auth.use('api').logout()
     response.status(200).redirect('/api/users/login')
   }
 
