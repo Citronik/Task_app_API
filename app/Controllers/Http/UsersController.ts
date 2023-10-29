@@ -66,10 +66,10 @@ export default class UsersController {
       user.password = password
     }if (firstName) {
       console.log(firstName)
-      user.firstName = firstName
+      user.first_name = firstName
     }if (lastName) {
       console.log(lastName)
-      user.lastName = lastName
+      user.last_name = lastName
     }
     try {
       await user.save()
