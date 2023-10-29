@@ -59,20 +59,17 @@ export default class UsersController {
       })
     }
     const payload = await request.validate(UpdateUser)
-    const {username, first_name, last_name, password} = payload
-    console.log(username, first_name, last_name, password)
-    if (username) {
-      console.log(username)
-      user.username = username
-    }if (password) {
+    const { firstName, lastName, password} = payload
+    console.log(firstName, lastName, password)
+    if (password) {
       console.log(password)
       user.password = password
-    }if (first_name) {
-      console.log(first_name)
-      user.first_name = first_name
-    }if (last_name) {
-      console.log(last_name)
-      user.last_name = last_name
+    }if (firstName) {
+      console.log(firstName)
+      user.firstName = firstName
+    }if (lastName) {
+      console.log(lastName)
+      user.lastName = lastName
     }
     try {
       await user.save()
@@ -97,6 +94,8 @@ export default class UsersController {
   public async showMe ({ response, auth }) {
     console.log('showMe')
     const user = await User.find(auth.user.id)
+    await user?.load('profile')
+    console.log(user)
     if (!user) {
       return response.status(404).json({
         status: 'failed',

@@ -21,10 +21,10 @@ export default class User extends BaseModel {
   @column()
   public username: string
 
-  @column()
+  @column({ serializeAs: 'firstName' })
   public first_name: string | null
 
-  @column()
+  @column({ serializeAs: 'lastName' })
   public last_name: string | null
 
   @column()
