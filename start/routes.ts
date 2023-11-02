@@ -34,7 +34,8 @@ Route.group(() =>{
     Route.patch('update', 'UsersController.update').middleware('auth')
     Route.get('me', 'UsersController.showMe').middleware('auth')
     Route.get('', 'UsersController.getAllUsers')
-    Route.get(':id', 'UsersController.getOneUser').middleware('auth') // to be done
+    Route.get('validate', 'UsersController.isLoggedIn').middleware('auth') // done
+    Route.get(':id', 'UsersController.getOneUser').middleware('auth') // done tested
 
     Route.group(() =>{
       Route.get('me', 'ProfilesController.showMyProfile').middleware('auth')
