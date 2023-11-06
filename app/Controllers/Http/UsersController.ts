@@ -9,7 +9,7 @@ import UpdateUser from 'App/Validators/UpdateUserValidator'
 export default class UsersController {
   public async register ({ request }: HttpContextContract) {
     console.log('registration')
-    console.log(request)
+    //console.log(request)
     const payload = await request.validate(CreateUser)
     const user = await User.create(payload)
     const profile = await user.related('profile').create({})
@@ -35,7 +35,7 @@ export default class UsersController {
       })
     }
 
-    await auth.attempt(uid, password)
+    const token =await auth.use('api').attempt(uid, password)
     if (auth.user) {
       await auth.user.load('profile')
       if (auth.user.profile) {
@@ -45,13 +45,15 @@ export default class UsersController {
     return response.status(200).json({
       status: 'success',
       message: 'User logged in!',
-      data: auth.user?.toJSON(),
+      user: auth.user?.toJSON(),
+      token: token.toJSON(),
     })
   }
 
-  public async update ({ request, response, auth }) {
+  public async update ({ request, response, auth } : HttpContextContract) {
     console.log('update')
-    const user = await User.find(auth.user.id)
+    const user = await User.find(auth.user?.id)
+    //let user = await auth.user
     if (!user) {
       return response.status(404).json({
         status: 'failed',
@@ -59,26 +61,18 @@ export default class UsersController {
       })
     }
     const payload = await request.validate(UpdateUser)
-    const {username, first_name, last_name, password} = payload
-    console.log(username, first_name, last_name, password)
-    if (username) {
-      console.log(username)
-      user.username = username
-    }if (password) {
-      console.log(password)
-      user.password = password
-    }if (first_name) {
-      console.log(first_name)
-      user.first_name = first_name
-    }if (last_name) {
-      console.log(last_name)
-      user.last_name = last_name
-    }
+    const { firstName, lastName} = payload
+    console.log(firstName, lastName)
+    user.first_name = firstName ? firstName : user.first_name
+    user.last_name = lastName ? lastName : user.last_name
     try {
       await user.save()
+      await user.load('profile')
+      await user.profile.load('avatar')
+
       return response.status(200).json({
         status: 'success',
-        message: 'Profile updated!',
+        message: 'User updated!',
         data: user.toJSON(),
       })
     } catch (error) {
@@ -94,9 +88,11 @@ export default class UsersController {
     return await User.all()
   }
 
-  public async showMe ({ response, auth }) {
+  public async showMe ({ response, auth }: HttpContextContract) {
     console.log('showMe')
-    const user = await User.find(auth.user.id)
+    const user = await User.find(auth.user?.id)
+    await user?.load('profile')
+    //console.log(user)
     if (!user) {
       return response.status(404).json({
         status: 'failed',
@@ -112,11 +108,11 @@ export default class UsersController {
 
   public async logout ({ auth, response }) {
     console.log('logout')
-    await auth.logout()
+    await auth.use('api').logout()
     response.status(200).redirect('/api/users/login')
   }
 
-  public async getOneUser ({ params, response, auth }) {
+  public async getOneUser ({ params, response }: HttpContextContract) {
     console.log('getOneUser')
     try {
       const user = await User.find(params.id)
@@ -126,6 +122,7 @@ export default class UsersController {
           message: 'User not found',
         })
       }
+      await user.load('profile')
       return response.status(200).json({
         status: 'success',
         message: 'User found',
@@ -138,5 +135,10 @@ export default class UsersController {
         message: error.message,
       })
     }
+  }
+
+  public async isLoggedIn ({ auth }: HttpContextContract) {
+    console.log('isLoggedIn')
+    return auth.use('api').isLoggedIn
   }
 }
