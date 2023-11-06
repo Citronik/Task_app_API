@@ -1,53 +1,55 @@
-// import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
-import Message from 'App/Models/Message'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Room from 'App/Models/Room'
-import User from 'App/Models/User'
-import CreateMessage from 'App/Validators/Message/CreateMessageValidator'
+import MessageRepository from 'App/Repositories/MessageRepository'
+import MessageService from 'App/Services/MessageService'
+import CreateMessageValidator from 'App/Validators/Message/CreateMessageValidator'
+import IndexMessageValidator from 'App/Validators/Message/IndexMessageValidator'
 
 export default class MessagesController {
-  public async getRoomMessages ({ params, bouncer }) {
-    console.log('Get a '+ params.id +' Room Messages')
+  public async index({ acl, request, params, bouncer }: HttpContextContract) {
+    const payload = await request.validate(IndexMessageValidator)
+
     const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('isParticipants', room)
-    await room.load('messages')
-    return room.messages
+    await bouncer.with('MessagePolicy').forUser(acl).authorize('viewList', room)
+
+    const messages = await MessageRepository.get({
+      ...payload,
+      roomId: params.id,
+    }).paginate(payload.page ?? 1, payload.perPage ?? 20)
+
+    return messages
   }
 
-  public async getRoomMessage ({ params, bouncer }) {
-    console.log('Get a '+ params.id +' Room Message: ' + params.msg_id)
+  public async show({ acl, params, bouncer }: HttpContextContract) {
     const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('isParticipants', room)
-    await room.load('messages')
-    return room.messages.filter((message) => {
-      if (message.id === params.msg_id) {
-        return message
-      }
-    })
-  }
 
-  public async create ({ auth, request, params, bouncer }) {
-    console.log('Get a '+ params.id +' Room Message: ')
-    const room = await Room.findOrFail(params.id)
-    //const user = await User.findOrFail(auth.user.id);
-    await bouncer.with('RoomPolicy').authorize('isParticipants', room)
-    const payload = await request.validate(CreateMessage)
-    const message = new Message()
-    message.merge(payload)
-    message.user_id = auth.user.id
-    await message.related('room').associate(room)
+    const message = await MessageRepository.getById(params.message_id).firstOrFail()
+    await bouncer.with('MessagePolicy').forUser(acl).authorize('view', message, room)
+
     return message
   }
 
-  public async destroy ({ params, auth, bouncer }) {
+  public async store({ acl, auth, request, params, bouncer }: HttpContextContract) {
+    const payload = await request.validate(CreateMessageValidator)
+
     const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('isParticipants', room)
-    const message = await Message.query()
-      .where('room_id', params.id)
-      .where('id', params.msg_id)
-      .where('user_id', auth.user.id)
-      .firstOrFail()
-    await message.delete()
-    return true
+    await bouncer.with('MessagePolicy').forUser(acl).authorize('create', room)
+
+    const message = await MessageService.create(payload, room, auth.user!)
+
+    return message
+  }
+
+  public async destroy({ acl, params, auth, bouncer }: HttpContextContract) {
+    const room = await Room.findOrFail(params.id)
+    const message = await MessageRepository.getById(params.message_id).firstOrFail()
+
+    await bouncer.with('MessagePolicy').forUser(acl).authorize('delete', message, room)
+
+    const status = await MessageService.delete(message, auth.user!)
+
+    return {
+      status,
+    }
   }
 }

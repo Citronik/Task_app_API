@@ -1,29 +1,40 @@
+import Config from '@ioc:Adonis/Core/Config'
+import {
+  BelongsTo,
+  belongsTo,
+  column,
+  hasMany,
+  HasMany,
+  manyToMany,
+  ManyToMany,
+  ModelQueryBuilderContract,
+  scope,
+} from '@ioc:Adonis/Lucid/Orm'
+import { AttachmentConfig } from 'Config/attachment'
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column, hasMany, HasMany, manyToMany,
-  ManyToMany } from '@ioc:Adonis/Lucid/Orm'
-import User from './User'
+import BaseModel from './BaseModel'
+import File from './File'
 import Message from './Message'
 import Task from './Task'
-import Upload from './Upload'
+import User from './User'
+
+export const PhotoConfig: AttachmentConfig = Config.get('attachment.room')
 
 export default class Room extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public room_id: number
+  public creatorId: number
 
   @column()
-  public creator_id: number
+  public name: string
 
   @column()
-  public room_name: string
+  public table: string
 
   @column()
-  public room_table: string
-
-  @column()
-  public photo_id: number | null
+  public photoId: number | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -31,36 +42,24 @@ export default class Room extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @belongsTo(() => User, {
-    localKey: 'id',
-    foreignKey: 'creator_id',
-  })
+  @belongsTo(() => User)
   public creator: BelongsTo<typeof User>
 
-  @belongsTo(() => Upload, {
-    foreignKey: 'photo_id',
-    localKey: 'id',
+  @belongsTo(() => File, {
+    foreignKey: 'photoId',
   })
-  public photo: BelongsTo<typeof Upload>
+  public photo: BelongsTo<typeof File>
 
   @manyToMany(() => User, {
-    pivotTable: 'participants',
-    pivotForeignKey: 'participant_id',
+    pivotTable: 'room_users',
+    pivotForeignKey: 'user_id',
     pivotRelatedForeignKey: 'room_id',
   })
   public participants: ManyToMany<typeof User>
 
-  @hasMany(() => Message, {
-    serializeAs: 'room_messages',
-    localKey: 'id',
-    foreignKey: 'room_id',
-  })
+  @hasMany(() => Message)
   public messages: HasMany<typeof Message>
 
-  @hasMany(() => Task, {
-    serializeAs: 'room_tasks',
-    localKey: 'id',
-    foreignKey: 'room_id',
-  })
+  @hasMany(() => Task)
   public tasks: HasMany<typeof Task>
 }

@@ -1,12 +1,13 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { column } from '@ioc:Adonis/Lucid/Orm'
+import BaseModel from './BaseModel'
 
 export default class Token extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public user_id: number
+  public userId: number
 
   @column()
   public name: string
@@ -16,7 +17,6 @@ export default class Token extends BaseModel {
 
   @column()
   public token: string
-
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

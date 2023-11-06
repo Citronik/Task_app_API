@@ -1,77 +1,71 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
-import Room from 'App/Models/Room'
-import User from 'App/Models/User'
-import CreateRoom from 'App/Validators/Room/CreateRoomValidator'
-import UploadsController from './UploadsController'
+import RoomRepository from 'App/Repositories/RoomRepository'
+import RoomService from 'App/Services/RoomService'
+import CreateRoomValidator from 'App/Validators/Room/CreateRoomValidator'
+import IndexRoomValidator from 'App/Validators/Room/IndexRoomValidator'
+import UpdateRoomValidator from 'App/Validators/Room/UpdateRoomValidator'
+import UploadPhotoRoomValidator from 'App/Validators/Room/UploadPhotoRoomValidator'
 
 export default class RoomsController {
-  public async create ({ request, response, auth }){
-    console.log('Create Room')
-    const user = await User.findOrFail(auth.user.id)
-    const payload = await request.validate(CreateRoom)
-    const room = new Room()
-    room.merge(payload)
-    await user.related('room').save(room)
-    if (request.file('file')) {
-      console.log('Uploading file')
-      const uploadController = new UploadsController()
-      const upload = await uploadController.upload(request)
-      if (!upload) {
-        return response.status(404).json({
-          status: 'failed',
-          message: 'Upload file failed',
-        })
-      }
-      await room.related('photo').associate(upload)
-    }
-    return room
-  }
+  public async index({ acl, request, bouncer }: HttpContextContract) {
+    const payload = await request.validate(IndexRoomValidator)
 
-  public async getAllMyRooms ({ auth }) {
-    console.log('Get all rooms')
-    const user = await User.findOrFail(auth.user.id)
-    const rooms = await user.related('room').query()
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('viewList', payload)
+
+    const rooms = await RoomRepository.get(payload).paginate(
+      payload.page ?? 1,
+      payload.perPage ?? 20
+    )
+
     return rooms
   }
 
-  public async getRoom ({ params, bouncer }) {
-    console.log('Get a '+ params.id +' Room')
-    const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('view', room)
+  public async show({ params, acl, bouncer }: HttpContextContract) {
+    const room = await RoomRepository.getById(params.id).firstOrFail()
+
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('view', room)
+
     return room
   }
 
-  public async update ({ request, response, params, bouncer, auth }: HttpContextContract) {
-    console.log('Update a '+ params.id +' Room')
-    const user = await User.findOrFail(auth.user?.id)
-    const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('update', room)
-    const payload = await request.validate(CreateRoom)
-    room.merge(payload)
-    await user.related('room').save(room)
-    if (request.file('file')) {
-      console.log('Uploading file')
-      const uploadController = new UploadsController()
-      const upload = await uploadController.upload({ request } as HttpContextContract)
-      if (!upload) {
-        return response.status(404).json({
-          status: 'failed',
-          message: 'Upload file failed',
-        })
-      }
-      await room.related('photo').associate(upload)
+  public async store({ request, bouncer, acl, auth }: HttpContextContract) {
+    const payload = await request.validate(CreateRoomValidator)
+
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('create')
+
+    const room = await RoomService.create(payload, auth.user!)
+
+    return room
+  }
+
+  public async update({ request, acl, params, bouncer, auth }: HttpContextContract) {
+    let room = await RoomRepository.getById(params.id).firstOrFail()
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('update', room)
+
+    const payload = await request.validate(UpdateRoomValidator)
+
+    room = await RoomService.update(room, payload, auth.user!)
+
+    return room
+  }
+
+  public async delete({ auth, acl, params, bouncer }: HttpContextContract) {
+    const room = await RoomRepository.getById(params.id).firstOrFail()
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('delete', room)
+
+    const status = await RoomService.delete(room, auth.user!)
+
+    return {
+      status,
     }
-    return room
   }
 
-  public async delete ({ params, bouncer }) {
-    console.log('Delete a '+ params.id +' Room')
-    const room = await Room.findOrFail(params.id)
-    await bouncer.with('RoomPolicy').authorize('update', room)
-    //await Message.query().where('room_id', room.id).delete();
-    //await Task.query().where('room_id', room.id).delete();
-    await room.delete()
-    return room
+  public async uploadPhoto({ request, auth, acl, params, bouncer }: HttpContextContract) {
+    const room = await RoomRepository.getById(params.id).firstOrFail()
+    await bouncer.with('RoomPolicy').forUser(acl).authorize('update', room)
+
+    const payload = await request.validate(UploadPhotoRoomValidator)
+
+    return await RoomService.uploadPhoto(room, payload, auth.user!)
   }
 }
