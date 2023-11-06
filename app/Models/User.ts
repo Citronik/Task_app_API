@@ -1,16 +1,31 @@
-import { DateTime } from 'luxon'
+import Config from '@ioc:Adonis/Core/Config'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, BaseModel, hasOne, HasOne, HasMany, hasMany, ManyToMany, manyToMany,
-  afterCreate } from '@ioc:Adonis/Lucid/Orm'
-import Profile from './Profile'
-import Room from './Room'
-import Participant from './Participant'
+import {
+  HasMany,
+  HasOne,
+  ManyToMany,
+  beforeSave,
+  column,
+  hasMany,
+  hasOne,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
+import { AttachmentConfig } from 'Config/attachment'
+import { DateTime } from 'luxon'
 import Message from './Message'
+import UserProfile from './UserProfile'
+import Room from './Room'
 import Task from './Task'
+import BaseModel from './BaseModel'
+
+export const AvatarConfig: AttachmentConfig = Config.get('attachment.user')
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
+
+  @column()
+  public roleId: number
 
   @column()
   public email: string
@@ -21,11 +36,11 @@ export default class User extends BaseModel {
   @column()
   public username: string
 
-  @column({ serializeAs: 'firstName' })
-  public first_name: string | null
+  @column()
+  public firstName: string | null
 
-  @column({ serializeAs: 'lastName' })
-  public last_name: string | null
+  @column()
+  public lastName: string | null
 
   @column()
   public rememberMeToken: string | null
@@ -36,21 +51,21 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasOne(() => Profile, {
-    foreignKey: 'user_id',
+  @hasOne(() => UserProfile, {
+    foreignKey: 'userId',
   })
-  public profile: HasOne<typeof Profile>
+  public profile: HasOne<typeof UserProfile>
 
   @hasMany(() => Room, {
     localKey: 'id',
-    foreignKey: 'creator_id',
+    foreignKey: 'creatorId',
   })
   public room: HasMany<typeof Room>
 
   @manyToMany(() => Room, {
-    pivotForeignKey: 'participant_id',
+    pivotForeignKey: 'user_id',
     pivotRelatedForeignKey: 'room_id',
-    pivotTable: 'participants',
+    pivotTable: 'room_users',
     pivotTimestamps: {
       createdAt: 'createdAt',
       updatedAt: false,
@@ -65,7 +80,7 @@ export default class User extends BaseModel {
   public tasks: HasMany<typeof Task>
 
   @beforeSave()
-  public static async hashPassword (user: User) {
+  public static async hashPassword(user: User) {
     if (user.$dirty.password) {
       user.password = await Hash.make(user.password)
     }
