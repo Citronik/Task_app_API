@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "curly": "error",
+    "prettier/prettier": ["error"]
+  },
+  "extends": ["plugin:adonis/typescriptApp", "prettier"],
+  "plugins": ["prettier"]
+}

@@ -1,33 +1,39 @@
 import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
-import User from 'App/Models/User'
 import Room from 'App/Models/Room'
-import Participant from 'App/Models/Participant'
-import Task from 'App/Models/Task'
+import User from 'App/Models/User'
+import { AclService } from 'App/Services/AclService'
+import { IndexRoomValidatorProps } from 'App/Validators/Room/IndexRoomValidator'
 
 export default class RoomPolicy extends BasePolicy {
-  public async view (user: User, room: Room) {
-    console.log(user.id, room.creator_id)
-    return user.id === room.creator_id
+  private async isParticipant(room: Room, user: User) {
+    return (await room.related('participants').query().where('userId', user.id).first()) !== null
   }
 
-  public async update (user: User, room: Room) {
-    return user.id === room.creator_id
-  }
-
-  public async isParticipants (user: User, room: Room) {
-    if (user.id === room.creator_id) {
-      return true
+  public async viewList(acl: AclService, payload: IndexRoomValidatorProps) {
+    if (!acl.has('rooms', 'read')) {
+      payload.userId = acl.user?.id
     }
-    await room.load('participants')
-    console.log(room.participants)
-    // room.participants.filter((participant) => {
-    //   return participant.id === user.id;
-    // });
-    return room.participants.find((participant) => {
-      return participant.id === user.id
-    })
+
+    return true
   }
-  public async isCreatorOfTask (user: User, task: Task) {
-    return user.id === task.creator_id
+
+  public async view(acl: AclService, room: Room) {
+    return (
+      acl.has('rooms', 'read') ||
+      room.creatorId === acl.user.id ||
+      (await this.isParticipant(room, acl.user))
+    )
+  }
+
+  public async create(acl: AclService) {
+    return acl.has('rooms', 'create')
+  }
+
+  public async update(acl: AclService, room: Room) {
+    return acl.has('rooms', 'update') || room.creatorId === acl.user.id
+  }
+
+  public async delete(acl: AclService, room: Room) {
+    return acl.has('rooms', 'delete') || room.creatorId === acl.user.id
   }
 }

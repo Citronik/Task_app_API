@@ -1,25 +1,30 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import TaskStatus from 'App/Enums/TaskStatus'
+import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Room from './Room'
 import User from './User'
+import BaseModel from './BaseModel'
+
+export const TaskStatuses = ['todo', 'execution', 'done'] as const
+export type TaskStatus = (typeof TaskStatuses)[number]
 
 export default class Task extends BaseModel {
-  public static table = 'room_tasks'
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public creator_id: number
+  public roomId: number
 
   @column()
-  public owner_id: number
+  public creatorId: number
 
   @column()
-  public task_name: string
+  public ownerId: number
 
   @column()
-  public task_description: string
+  public name: string
+
+  @column()
+  public description: string
 
   @column()
   public status: TaskStatus
@@ -34,5 +39,8 @@ export default class Task extends BaseModel {
   public room: BelongsTo<typeof Room>
 
   @belongsTo(() => User)
-  public author: BelongsTo<typeof User>
+  public creator: BelongsTo<typeof User>
+
+  @belongsTo(() => User)
+  public owner: BelongsTo<typeof User>
 }
