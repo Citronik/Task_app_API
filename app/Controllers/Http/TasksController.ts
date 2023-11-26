@@ -15,7 +15,7 @@ export default class TasksController {
   }
 
   public async show({ acl, params, bouncer }: HttpContextContract) {
-    Logger.info('Get a ' + params.id + ' Room Message: ' + params.message_id)
+    Logger.info('Get a ' + params.id + ' Room task: ' + params.message_id)
     const room = await Room.findOrFail(params.id)
     await bouncer.with('TaskPolicy').forUser(acl).authorize('view', task)
     await room.load('messages')
@@ -30,7 +30,7 @@ export default class TasksController {
     Logger.info('Get a ' + params.id + ' Room Message: ')
     const room = await Room.findOrFail(params.id)
     //const user = await User.findOrFail(auth.user.id);
-    await bouncer.with('TaskPolicy').forUser(acl).authorize('create', room)
+    await bouncer.with('TaskPolicy').forUser(acl).authorize('create', room.id)
     const payload = await request.validate(CreateTask)
     const task = new Task()
     task.merge(payload)

@@ -43,6 +43,9 @@ class UserService {
 
     await auth.login(user, true)
 
+    await user.load('profile', (query) => query.preload('avatar'))
+    console.log(user)
+
     return user
   }
 

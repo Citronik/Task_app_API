@@ -13,7 +13,7 @@ export function roomsRoutes() {
           .where('message_id', Route.matchers.number())
           .as('messages')
 
-        Route.resource('tasks', 'MessagesController')
+        Route.resource('tasks', 'TasksController')
           .apiOnly()
           .paramFor('tasks', 'task_id')
           .where('task_id', Route.matchers.number())

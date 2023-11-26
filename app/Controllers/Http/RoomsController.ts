@@ -5,9 +5,11 @@ import CreateRoomValidator from 'App/Validators/Room/CreateRoomValidator'
 import IndexRoomValidator from 'App/Validators/Room/IndexRoomValidator'
 import UpdateRoomValidator from 'App/Validators/Room/UpdateRoomValidator'
 import UploadPhotoRoomValidator from 'App/Validators/Room/UploadPhotoRoomValidator'
+import { logger } from 'Config/app'
 
 export default class RoomsController {
   public async index({ acl, request, bouncer }: HttpContextContract) {
+    logger.info('RoomsController: index')
     const payload = await request.validate(IndexRoomValidator)
 
     await bouncer.with('RoomPolicy').forUser(acl).authorize('viewList', payload)
@@ -21,6 +23,7 @@ export default class RoomsController {
   }
 
   public async show({ params, acl, bouncer }: HttpContextContract) {
+    logger.info('RoomsController: show')
     const room = await RoomRepository.getById(params.id).firstOrFail()
 
     await bouncer.with('RoomPolicy').forUser(acl).authorize('view', room)
@@ -29,6 +32,7 @@ export default class RoomsController {
   }
 
   public async store({ request, bouncer, acl, auth }: HttpContextContract) {
+    logger.info('RoomsController: store')
     const payload = await request.validate(CreateRoomValidator)
 
     await bouncer.with('RoomPolicy').forUser(acl).authorize('create')
@@ -39,6 +43,7 @@ export default class RoomsController {
   }
 
   public async update({ request, acl, params, bouncer, auth }: HttpContextContract) {
+    logger.info('RoomsController: update')
     let room = await RoomRepository.getById(params.id).firstOrFail()
     await bouncer.with('RoomPolicy').forUser(acl).authorize('update', room)
 
@@ -50,6 +55,7 @@ export default class RoomsController {
   }
 
   public async delete({ auth, acl, params, bouncer }: HttpContextContract) {
+    logger.info('RoomsController: delete')
     const room = await RoomRepository.getById(params.id).firstOrFail()
     await bouncer.with('RoomPolicy').forUser(acl).authorize('delete', room)
 
@@ -61,6 +67,7 @@ export default class RoomsController {
   }
 
   public async uploadPhoto({ request, auth, acl, params, bouncer }: HttpContextContract) {
+    logger.info('RoomsController: uploadPhoto')
     const room = await RoomRepository.getById(params.id).firstOrFail()
     await bouncer.with('RoomPolicy').forUser(acl).authorize('update', room)
 
