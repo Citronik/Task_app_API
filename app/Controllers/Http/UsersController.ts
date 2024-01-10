@@ -9,14 +9,14 @@ import { logger } from 'Config/app'
 
 export default class UsersController {
   public async index({ bouncer, acl }: HttpContextContract) {
-    logger.info('UsersController: index')
+    logger.info('[UserController] index')
     await bouncer.with('UserPolicy').forUser(acl).authorize('viewList')
 
     return await User.query().preload('profile', (query) => query.preload('avatar'))
   }
 
   public async show({ acl, auth, params, bouncer }: HttpContextContract) {
-    logger.info('UsersController: show')
+    logger.info('[UserController] show')
     const id = !params.id || params.id === 'me' ? auth.user!.id : params.id
     const user = await User.findOrFail(id)
 
@@ -28,7 +28,7 @@ export default class UsersController {
   }
 
   public async update({ request, auth, params, acl, bouncer }: HttpContextContract) {
-    logger.info('UsersController: update')
+    logger.info('[UserController] update')
     const payload = await request.validate(UpdateUserValidator)
 
     const id = !params.id || params.id === 'me' ? auth.user!.id : params.id
@@ -42,7 +42,7 @@ export default class UsersController {
   }
 
   public async register({ request }: HttpContextContract) {
-    logger.info('UsersController: register')
+    logger.info('[UserController] register')
     const payload = await request.validate(RegisterUserValidator)
 
     await UserService.register(payload)
@@ -53,7 +53,7 @@ export default class UsersController {
   }
 
   public async login({ request, auth }: HttpContextContract) {
-    logger.info('UsersController: login')
+    logger.info('[UserController] login')
     const payload = await request.validate(LoginUserValidator)
 
     await UserService.login(auth, payload)
@@ -62,18 +62,18 @@ export default class UsersController {
   }
 
   public async logout({ auth, response }: HttpContextContract) {
-    logger.info('UsersController: logout')
+    logger.info('[UsersController] logout')
     await auth.use('web').logout()
     response.status(200).redirect('/api/users/login')
   }
 
   public async isLoggedIn({ auth }: HttpContextContract) {
-    logger.info('UsersController: isLoggedIn')
+    logger.info('[UserController] isLoggedIn')
     return auth.isLoggedIn
   }
 
   public async uploadAvatar({ auth, request }: HttpContextContract) {
-    logger.info('UsersController: uploadAvatar')
+    logger.info('[UserController] uploadAvatar')
     const payload = await request.validate(UploadAvatarUserValidator)
 
     return await UserService.uploadAvatar(payload, auth.user!)

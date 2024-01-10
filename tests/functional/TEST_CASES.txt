@@ -1,0 +1,34 @@
+GET|HEAD     /uploads/* ────────────────────────────────────────────────────────────────────────────────────────────────────── drive.local.serve › Closure
+GET|HEAD     /api/config ──────────────────────────────────────────────────────────────────────────────────────────────────────────── AppController.config
+GET|HEAD     /api/health ──────────────────────────────────────────────────────────────────────────────────────────────────────────── AppController.health
+GET|HEAD     /api ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────── AppController.health
+POST         /api/users/register ──────────────────────────────────────────────────────────────────────────────────────────────── UsersController.register
+POST         /api/users/login ────────────────────────────────────────────────────────────────────────────────────────────────────── UsersController.login
+POST         /api/users/logout ──────────────────────────────────────────────────────────────────────────────────────────────────── UsersController.logout
+GET|HEAD     /api/users/validate ────────────────────────────────────────────────────────────────────────────────────────────── UsersController.isLoggedIn
+GET|HEAD     /api/users/me ────────────────────────────────────────────────────────────────────────────────────────────── self.show › UsersController.show
+PATCH        /api/users/me ────────────────────────────────────────────────────────────────────────────────────────── self.update › UsersController.update
+POST         /api/users/upload-avatar ─────────────────────────────────────────────────────────────────────────────────────── UsersController.uploadAvatar
+GET|HEAD     /api/users ────────────────────────────────────────────────────────────────────────────────────────────── users.index › UsersController.index
+GET|HEAD     /api/users/:id ──────────────────────────────────────────────────────────────────────────────────────────── users.show › UsersController.show
+PUT|PATCH    /api/users/:id ──────────────────────────────────────────────────────────────────────────────────────── users.update › UsersController.update
+GET|HEAD     /api/files/:id ───────────────────────────────────────────────────────────────────────────────────────────────────────── FilesController.show
+POST         /api/rooms/upload-photo ──────────────────────────────────────────────────────────────────── rooms.upload-photo › RoomsController.uploadPhoto
+GET|HEAD     /api/rooms/:id/messages ───────────────────────────────────────────────────────────────────── rooms.messages.index › MessagesController.index
+POST         /api/rooms/:id/messages ───────────────────────────────────────────────────────────────────── rooms.messages.store › MessagesController.store
+GET|HEAD     /api/rooms/:id/messages/:message_id ─────────────────────────────────────────────────────────── rooms.messages.show › MessagesController.show
+DELETE       /api/rooms/:id/messages/:message_id ───────────────────────────────────────────────────── rooms.messages.destroy › MessagesController.destroy
+GET|HEAD     /api/rooms/:id/tasks ────────────────────────────────────────────────────────────────────────────── rooms.tasks.index › TasksController.index
+POST         /api/rooms/:id/tasks ────────────────────────────────────────────────────────────────────────────── rooms.tasks.store › TasksController.store
+GET|HEAD     /api/rooms/:id/tasks/:task_id ─────────────────────────────────────────────────────────────────────── rooms.tasks.show › TasksController.show
+PUT|PATCH    /api/rooms/:id/tasks/:task_id ─────────────────────────────────────────────────────────────────── rooms.tasks.update › TasksController.update
+DELETE       /api/rooms/:id/tasks/:task_id ───────────────────────────────────────────────────────────────── rooms.tasks.destroy › TasksController.destroy
+GET|HEAD     /api/rooms/:id/users ────────────────────────────────────────────────────────────────────────── rooms.users.index › RoomUsersController.index
+POST         /api/rooms/:id/users ────────────────────────────────────────────────────────────────────────── rooms.users.store › RoomUsersController.store
+GET|HEAD     /api/rooms/:id/users/:user_id ─────────────────────────────────────────────────────────────────── rooms.users.show › RoomUsersController.show
+DELETE       /api/rooms/:id/users/:user_id ───────────────────────────────────────────────────────────── rooms.users.destroy › RoomUsersController.destroy
+GET|HEAD     /api/rooms ────────────────────────────────────────────────────────────────────────────────────────────── rooms.index › RoomsController.index
+POST         /api/rooms ────────────────────────────────────────────────────────────────────────────────────────────── rooms.store › RoomsController.store
+GET|HEAD     /api/rooms/:id ──────────────────────────────────────────────────────────────────────────────────────────── rooms.show › RoomsController.show
+PUT|PATCH    /api/rooms/:id ──────────────────────────────────────────────────────────────────────────────────────── rooms.update › RoomsController.update
+DELETE       /api/rooms/:id ────────────────────────────────────────────────────────────────────────────────────── rooms.destroy › RoomsController.destroy

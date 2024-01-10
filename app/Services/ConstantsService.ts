@@ -17,7 +17,8 @@ class ConstantsService {
     this.roles = roles
     this.permissions = permissions
 
-    Logger.info('ConstantsService: constants loaded')
+    Logger.info('[ConstantsService] loaded %s roles', this.roles.length)
+    Logger.info('[ConstantsService] loaded %s permissions', this.permissions.length)
   }
 
   public updaterSchedule() {
@@ -29,6 +30,7 @@ class ConstantsService {
         this.load()
         this.updaterSchedule()
       }, constantsConfig.updaterInterval)
+    Logger.debug('[ConstantsService] updater scheduled to : %s', this.updaterTimer)
   }
 
   public updaterStop() {
@@ -37,17 +39,21 @@ class ConstantsService {
 
       this.updaterTimer = null
     }
+    Logger.debug('[ConstantsService] updater stopped')
   }
 
   public getRole(id: number) {
+    Logger.debug('[ConstantsService] getRole: %s', id)
     return this.roles.find((item) => item.id === id)
   }
 
   public getDefaultRole() {
+    Logger.debug('[ConstantsService] getDefaultRole')
     return this.roles.find((item) => item.isDefault)!
   }
 
   public getPermission(id: number) {
+    Logger.debug('[ConstantsService] getPermission: %s', id)
     return this.permissions.find((item) => item.id === id)
   }
 }

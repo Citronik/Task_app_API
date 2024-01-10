@@ -26,6 +26,26 @@ export default class extends BaseSeeder {
         ],
       },
       { uid: 'admin', name: 'Super Admin', isAdmin: true, permissions: [] },
+      {
+        uid: 'roomOwner',
+        name: 'Room Admin',
+        permissions: [
+          ['users', ['read']],
+          ['rooms', ['update', 'read', 'create', 'delete']],
+          ['messages', ['update', 'read', 'create', 'delete']],
+          ['tasks', ['update', 'read', 'create', 'delete']],
+        ],
+      },
+      {
+        uid: 'roomParticipant',
+        name: 'Room Participant',
+        permissions: [
+          ['users', ['read']],
+          ['rooms', ['update', 'read', 'create', 'delete']],
+          ['messages', ['update', 'read', 'create', 'delete']],
+          ['tasks', ['update', 'read', 'create', 'delete']],
+        ],
+      },
     ]
 
     for (const roleData of roles) {
