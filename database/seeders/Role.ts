@@ -27,18 +27,18 @@ export default class extends BaseSeeder {
       },
       { uid: 'admin', name: 'Super Admin', isAdmin: true, permissions: [] },
       {
-        uid: 'roomOwner',
-        name: 'Room Admin',
+        uid: 'roomParticipant',
+        name: 'Room Participant',
         permissions: [
           ['users', ['read']],
-          ['rooms', ['update', 'read', 'create', 'delete']],
+          ['rooms', ['read', 'create']],
           ['messages', ['update', 'read', 'create', 'delete']],
           ['tasks', ['update', 'read', 'create', 'delete']],
         ],
       },
       {
-        uid: 'roomParticipant',
-        name: 'Room Participant',
+        uid: 'roomOwner',
+        name: 'Room Admin',
         permissions: [
           ['users', ['read']],
           ['rooms', ['update', 'read', 'create', 'delete']],
