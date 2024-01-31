@@ -30,9 +30,10 @@ export class AclService {
     const access = this.role.permissions.find((item) => item.permissionId === permission.id)
 
     if (!access) {
+      Logger.debug('[AclService] Access not found for permission %s', permissionName)
       return false
     }
-
+    Logger.debug('[AclService] Access found for permission %s', permissionName)
     return access.actions.includes(type)
   }
 

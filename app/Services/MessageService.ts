@@ -14,8 +14,8 @@ class MessageService {
 
     await Database.transaction(async (trx) => {
       message.useTransaction(trx)
-      await message.save()
       await message.related('room').associate(room)
+      await message.save()
     })
 
     return message

@@ -4,9 +4,11 @@ import MessageRepository from 'App/Repositories/MessageRepository'
 import MessageService from 'App/Services/MessageService'
 import CreateMessageValidator from 'App/Validators/Message/CreateMessageValidator'
 import IndexMessageValidator from 'App/Validators/Message/IndexMessageValidator'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class MessagesController {
   public async index({ acl, request, params, bouncer }: HttpContextContract) {
+    Logger.info('[MessagesController] index')
     const payload = await request.validate(IndexMessageValidator)
 
     const room = await Room.findOrFail(params.id)
@@ -16,11 +18,11 @@ export default class MessagesController {
       ...payload,
       roomId: params.id,
     }).paginate(payload.page ?? 1, payload.perPage ?? 20)
-
     return messages
   }
 
   public async show({ acl, params, bouncer }: HttpContextContract) {
+    Logger.info('[MessagesController] show')
     const room = await Room.findOrFail(params.id)
 
     const message = await MessageRepository.getById(params.message_id).firstOrFail()
@@ -30,6 +32,7 @@ export default class MessagesController {
   }
 
   public async store({ acl, auth, request, params, bouncer }: HttpContextContract) {
+    Logger.info('[MessagesController] store')
     const payload = await request.validate(CreateMessageValidator)
 
     const room = await Room.findOrFail(params.id)
@@ -41,6 +44,7 @@ export default class MessagesController {
   }
 
   public async destroy({ acl, params, auth, bouncer }: HttpContextContract) {
+    Logger.info('[MessagesController] destroy')
     const room = await Room.findOrFail(params.id)
     const message = await MessageRepository.getById(params.message_id).firstOrFail()
 

@@ -23,7 +23,9 @@ export default class Message extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @belongsTo(() => Room)
+  @belongsTo(() => Room, {
+    foreignKey: 'roomId',
+  })
   public room: BelongsTo<typeof Room>
 
   @belongsTo(() => User, {

@@ -6,9 +6,9 @@ export default class UpdateTaskValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    name: schema.string({}, [rules.maxLength(120)]),
-    description: schema.string({}, []),
-    status: schema.enum(TaskStatuses),
+    name: schema.string.optional({}, [rules.maxLength(120)]),
+    description: schema.string.optional({}, []),
+    status: schema.enum.optional(TaskStatuses),
     deadline: schema.date.optional({
       format: 'sql',
     }),

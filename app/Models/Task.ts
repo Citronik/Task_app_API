@@ -29,6 +29,9 @@ export default class Task extends BaseModel {
   @column()
   public status: TaskStatus
 
+  @column.dateTime()
+  public deadline: DateTime
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

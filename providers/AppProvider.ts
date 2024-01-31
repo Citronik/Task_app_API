@@ -1,4 +1,5 @@
 import type { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
@@ -21,7 +22,7 @@ export default class AppProvider {
     } catch (err) {
       if (this.app.environment !== 'console') {
         // TODO: log error?
-        console.log(err)
+        Logger.error('[AppProvider]', err)
       }
     }
   }
